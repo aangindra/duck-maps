@@ -1,6 +1,7 @@
-# DuckMaps
+# 🦆 DuckMaps
 
 This project i'm present for one of company on Malaysia that assign me a technical interview
+<img width="1440" alt="image" src="https://user-images.githubusercontent.com/50355424/190923428-db6f47f6-ec42-4b94-8d64-3dcf1d07ef26.png">
 
 ## 🚀&nbsp; Installation
 

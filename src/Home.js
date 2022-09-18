@@ -178,7 +178,7 @@ const Home = () => {
         center={userLocation}
         defaultZoom={defaultProps.zoom}
       >
-        <Marker lat={MAPS.defaultLocation.lat} lng={MAPS.defaultLocation.lng} />
+        <Marker lat={userLocation.lat} lng={userLocation.lng} />
       </Map>
     </div>
   );
