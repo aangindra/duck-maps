@@ -1,6 +1,5 @@
 import axios from "axios";
-import lodash from "lodash";
-import { PLACE, USER } from "./actionTypes";
+import { PLACE } from "./actionTypes";
 import { URLs } from "../../constants";
 
 export const getPlaces = (data) => async (dispatch) => {
@@ -24,12 +23,7 @@ export const getPlaceDetails = (data) => async (dispatch) => {
       params: data,
     });
     const result = response.data.result;
-    const geometry = lodash.get(result, "geometry", {});
 
-    dispatch({
-      type: USER.UPDATE_USER_LOCATION,
-      payload: geometry.location,
-    });
     dispatch({
       type: PLACE.UPDATE_SELECTED_LOCATION,
       payload: result,

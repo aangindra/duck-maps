@@ -3,7 +3,7 @@ import Map from "google-map-react";
 import RoomIcon from "@mui/icons-material/Room";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { useDispatch, useSelector } from "react-redux";
-import { orderBy } from "lodash";
+import { orderBy, get } from "lodash";
 import { getPlaces, getPlaceDetails } from "./store/actions/placeAction";
 import { PLACE } from "./store/actions/actionTypes";
 import useStyles from "./Home.styles";
@@ -173,12 +173,17 @@ const Home = () => {
           onClear={selectedPlace ? handleClearInput : null}
         />
       </div>
+      {console.log(get(selectedPlace, "geometry.location", userLocation))}
       <Map
         bootstrapURLKeys={{ key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY }}
-        center={userLocation}
+        center={get(selectedPlace, "geometry.location", userLocation)}
+        defaultCenter={userLocation}
         defaultZoom={defaultProps.zoom}
       >
-        <Marker lat={userLocation.lat} lng={userLocation.lng} />
+        <Marker
+          lat={get(selectedPlace, "geometry.location", userLocation).lat}
+          lng={get(selectedPlace, "geometry.location", userLocation).lng}
+        />
       </Map>
     </div>
   );
