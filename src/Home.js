@@ -3,10 +3,12 @@ import Map from "google-map-react";
 import RoomIcon from "@mui/icons-material/Room";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { useDispatch, useSelector } from "react-redux";
-import { debounce, orderBy, set } from "lodash";
+import { orderBy } from "lodash";
 import { getPlaces, getPlaceDetails } from "./store/actions/placeAction";
+import { PLACE } from "./store/actions/actionTypes";
 import useStyles from "./Home.styles";
 import CustomInput from "./components/CustomInput";
+import PlaceDetail from "./components/PlaceDetail";
 import { MAPS } from "./constants";
 
 const Marker = () => (
@@ -60,6 +62,7 @@ const SearchResult = ({ classes, data, savedKeywords, onSelectPlace }) => {
 const Home = () => {
   const userLocation = useSelector((state) => state.user.userLocation);
   const places = useSelector((state) => state.place.places);
+  const selectedPlace = useSelector((state) => state.place.selectedPlace);
   const savedKeywords = useSelector((state) => state.place.savedKeywords);
   const containerRef = useRef(null);
   const searchWrapperRef = useRef(null);
@@ -71,7 +74,7 @@ const Home = () => {
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
 
   const defaultProps = {
-    zoom: 11,
+    zoom: 14,
   };
 
   const placeData = {
@@ -82,13 +85,6 @@ const Home = () => {
     types: "establishment",
     radius: 5000,
   };
-
-  useEffect(() => {
-    if (search.length >= 3) {
-      setIsOpenDropdown(true);
-      dispatch(getPlaces(placeData));
-    }
-  }, [search]);
 
   useEffect(() => {
     const searchInput = document.getElementById("searchInputField");
@@ -118,10 +114,15 @@ const Home = () => {
     };
   }, []);
 
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
+  const handleSearch = (value) => {
+    setSearch(value);
+    if (value.length >= 3) {
+      setIsOpenDropdown(true);
+      dispatch(getPlaces(placeData));
+    } else {
+      setIsOpenDropdown(false);
+    }
   };
-  const handleSearchDebounce = useCallback(debounce(handleSearch, 1000), []);
 
   const onSelectPlace = (place) => (e) => {
     const payload = {
@@ -130,14 +131,27 @@ const Home = () => {
       keyword: search,
     };
     dispatch(getPlaceDetails(payload));
+    setSearch(place.description);
+  };
+
+  const handleClearInput = () => {
+    dispatch({
+      type: PLACE.UPDATE_SELECTED_LOCATION,
+      payload: null,
+    });
     setSearch("");
+    setIsOpenDropdown(false);
   };
   return (
     <div className={classes.container} ref={containerRef}>
+      <PlaceDetail data={selectedPlace} open={selectedPlace} />
       <div className={classes.searchWrapper} ref={searchWrapperRef}>
         <CustomInput
           ref={customInputRef}
-          onChange={handleSearchDebounce}
+          value={search}
+          onChange={(e) => {
+            handleSearch(e.target.value);
+          }}
           children={
             isOpenDropdown ? (
               <div>
@@ -156,6 +170,7 @@ const Home = () => {
               </div>
             ) : null
           }
+          onClear={selectedPlace ? handleClearInput : null}
         />
       </div>
       <Map

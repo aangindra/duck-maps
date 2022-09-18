@@ -3,7 +3,7 @@ import { PLACE } from "../actions/actionTypes";
 const initialState = {
   places: [],
   savedKeywords: [],
-  isFetching: false,
+  selectedPlace: null,
 };
 
 const placeReducer = (state = initialState, action) => {
@@ -12,6 +12,11 @@ const placeReducer = (state = initialState, action) => {
       return {
         ...state,
         places: action.payload,
+      };
+    case PLACE.UPDATE_SELECTED_LOCATION:
+      return {
+        ...state,
+        selectedPlace: action.payload,
       };
     case PLACE.SAVE_KEYWORD_PLACE:
       return {

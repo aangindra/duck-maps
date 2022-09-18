@@ -31,6 +31,10 @@ export const getPlaceDetails = (data) => async (dispatch) => {
       payload: geometry.location,
     });
     dispatch({
+      type: PLACE.UPDATE_SELECTED_LOCATION,
+      payload: result,
+    });
+    dispatch({
       type: PLACE.SAVE_KEYWORD_PLACE,
       payload: {
         keyword: data.keyword,
@@ -41,6 +45,7 @@ export const getPlaceDetails = (data) => async (dispatch) => {
       type: PLACE.GET_PLACE,
       payload: [],
     });
+    return result;
   } catch (error) {
     console.log(error);
   }

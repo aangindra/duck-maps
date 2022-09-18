@@ -1,26 +1,15 @@
-import React, {
-  useState,
-  forwardRef,
-  useRef,
-  useEffect,
-  useImperativeHandle,
-} from "react";
+import React, { forwardRef } from "react";
 import Paper from "@mui/material/Paper";
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
+import CloseIcon from "@mui/icons-material/Close";
 import useStyles from "./CustomInput.styles";
 
 const CustomInput = forwardRef((props, ref) => {
-  const inputRef = useRef(null);
-  const [isFocusInput, setIsFocusInput] = useState(false);
-  const { onChange, children } = props;
+  const { value, onChange, children, onClear } = props;
   const { classes } = useStyles();
-
-  useImperativeHandle(ref, () => ({
-    isFocused: document.activeElement === inputRef.current,
-  }));
 
   return (
     <div ref={ref}>
@@ -29,18 +18,24 @@ const CustomInput = forwardRef((props, ref) => {
           <MenuIcon />
         </IconButton>
         <InputBase
+          value={value}
           sx={{ ml: 1, flex: 1 }}
           placeholder="Search your place (min. 3 characters)"
           inputProps={{ "aria-label": "search your place" }}
           onChange={onChange}
-          onFocus={(e) => setIsFocusInput(true)}
           id="searchInputField"
           autoComplete={"off"}
-          ref={inputRef}
         />
-        <IconButton type="button" sx={{ p: "10px" }} aria-label="search">
-          <SearchIcon />
-        </IconButton>
+        {onClear && (
+          <IconButton
+            type="button"
+            sx={{ p: "10px" }}
+            aria-label="close"
+            onClick={onClear}
+          >
+            <CloseIcon />
+          </IconButton>
+        )}
       </Paper>
       {children}
     </div>
