@@ -1,10 +1,10 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import Map from "google-map-react";
 import RoomIcon from "@mui/icons-material/Room";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { useDispatch, useSelector } from "react-redux";
-import { debounce } from "lodash";
-import { getPlaces } from "./store/actions/placeAction";
+import { debounce, orderBy, set } from "lodash";
+import { getPlaces, getPlaceDetails } from "./store/actions/placeAction";
 import useStyles from "./Home.styles";
 import CustomInput from "./components/CustomInput";
 import { MAPS } from "./constants";
@@ -15,12 +15,40 @@ const Marker = () => (
   </div>
 );
 
-const SearchResult = ({ classes, data }) => {
+const SavedKeyword = ({ classes, data, placeData, keyword }) => {
   return data && data.length ? (
-    <div className={classes.searchResult}>
+    <div
+      className={classes.savedKeyword}
+      style={placeData.length ? { paddingBottom: 0 } : {}}
+    >
+      {orderBy(data, ["_createdAt"], ["desc"])
+        .slice(0, 3)
+        .map((item, index) => (
+          <div className={classes.searchList} key={`${item.keyword}_${index}`}>
+            <AccessTimeIcon sx={{ color: "#a8a8a8" }} />
+            <span>{item.keyword}</span>
+          </div>
+        ))}
+    </div>
+  ) : null;
+};
+
+const SearchResult = ({ classes, data, savedKeywords, onSelectPlace }) => {
+  return data && data.length ? (
+    <div
+      className={classes.searchResult}
+      style={
+        savedKeywords.length
+          ? { marginTop: 0, paddingTop: 0, paddingBottom: "12px" }
+          : {}
+      }
+    >
       {data.map((item) => (
-        <div className={classes.searchList}>
-          {/* <AccessTimeIcon /> */}
+        <div
+          className={classes.searchList}
+          onClick={onSelectPlace(item)}
+          key={item.place_id}
+        >
           <RoomIcon sx={{ color: "#a8a8a8" }} />
           <span>{item.description}</span>
         </div>
@@ -32,10 +60,15 @@ const SearchResult = ({ classes, data }) => {
 const Home = () => {
   const userLocation = useSelector((state) => state.user.userLocation);
   const places = useSelector((state) => state.place.places);
+  const savedKeywords = useSelector((state) => state.place.savedKeywords);
+  const containerRef = useRef(null);
+  const searchWrapperRef = useRef(null);
+  const customInputRef = useRef(null);
   const { classes } = useStyles();
   const dispatch = useDispatch();
 
   const [search, setSearch] = useState("");
+  const [isOpenDropdown, setIsOpenDropdown] = useState(false);
 
   const defaultProps = {
     zoom: 11,
@@ -52,26 +85,82 @@ const Home = () => {
 
   useEffect(() => {
     if (search.length >= 3) {
+      setIsOpenDropdown(true);
       dispatch(getPlaces(placeData));
     }
   }, [search]);
+
+  useEffect(() => {
+    const searchInput = document.getElementById("searchInputField");
+    const handleClickOutside = ({ target }) => {
+      if (
+        searchWrapperRef.current.contains(target) ||
+        containerRef.current.contains(target)
+      ) {
+        if (!searchInput.contains(target)) {
+          setIsOpenDropdown(false);
+        }
+        return;
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+
+    const handleSearchInputFocus = ({ target }) => {
+      setIsOpenDropdown(true);
+    };
+    if (searchInput) {
+      searchInput.addEventListener("focus", handleSearchInputFocus);
+    }
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+      document.removeEventListener("click", handleSearchInputFocus);
+    };
+  }, []);
 
   const handleSearch = (e) => {
     setSearch(e.target.value);
   };
   const handleSearchDebounce = useCallback(debounce(handleSearch, 1000), []);
 
+  const onSelectPlace = (place) => (e) => {
+    const payload = {
+      key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+      place_id: place.place_id,
+      keyword: search,
+    };
+    dispatch(getPlaceDetails(payload));
+    setSearch("");
+  };
   return (
-    <div className={classes.container}>
-      <div className={classes.searchWrapper}>
+    <div className={classes.container} ref={containerRef}>
+      <div className={classes.searchWrapper} ref={searchWrapperRef}>
         <CustomInput
+          ref={customInputRef}
           onChange={handleSearchDebounce}
-          children={<SearchResult classes={classes} data={places} />}
+          children={
+            isOpenDropdown ? (
+              <div>
+                <SavedKeyword
+                  classes={classes}
+                  data={savedKeywords}
+                  placeData={places}
+                  keyword={search}
+                />
+                <SearchResult
+                  classes={classes}
+                  data={places}
+                  savedKeywords={savedKeywords}
+                  onSelectPlace={onSelectPlace}
+                />
+              </div>
+            ) : null
+          }
         />
       </div>
       <Map
         bootstrapURLKeys={{ key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY }}
-        defaultCenter={MAPS.defaultLocation}
+        center={userLocation}
         defaultZoom={defaultProps.zoom}
       >
         <Marker lat={MAPS.defaultLocation.lat} lng={MAPS.defaultLocation.lng} />

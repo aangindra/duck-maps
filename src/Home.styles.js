@@ -12,6 +12,7 @@ export const styles = (theme) => ({
     zIndex: 99999,
     top: 16,
     left: 16,
+    width: 400,
   },
   searchResult: {
     backgroundColor: "#fff",
@@ -20,7 +21,12 @@ export const styles = (theme) => ({
     borderBottomLeftRadius: 5,
     borderBottomRightRadius: 5,
     boxShadow: "0 2px 4px rgb(0 0 0 / 20%)",
-    width: 400,
+  },
+  savedKeyword: {
+    backgroundColor: "#fff",
+    marginTop: theme.spacing(0.1),
+    padding: theme.spacing(1.5, 0),
+    boxShadow: "0 2px 4px rgb(0 0 0 / 20%)",
   },
   searchList: {
     display: "flex",
