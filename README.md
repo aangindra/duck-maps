@@ -52,3 +52,37 @@ or
 ```shell
 $ yarn build
 ```
+
+Cheers!
+
+## FAQ
+
+**Question:** How to fix the CORS error like this?
+![CORS_ERROR](https://user-images.githubusercontent.com/50355424/190922862-407431f9-a543-4cb4-8799-038429a3c8d5.jpeg)
+
+**Answer:** This issue coming from Google API, because the Google API doesn't accept http request from localhost. Follow instructions below
+and choose based on the operating system your'e using.
+
+#### Windows
+
+Copy and paste this on Command Prompt
+
+```shell
+"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --disable-web-security --disable-gpu --user-data-dir=~/chromeTemp
+```
+
+#### Mac OS
+
+Copy and paste this on Terminal
+
+```shell
+open -na Google\ Chrome --args --user-data-dir=/tmp/temporary-chrome-profile-dir --disable-web-security
+```
+
+### Linux
+
+Copy and paste this on Terminal
+
+```shell
+google-chrome --disable-web-security
+```
