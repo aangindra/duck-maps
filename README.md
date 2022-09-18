@@ -87,3 +87,5 @@ Copy and paste this on Terminal
 ```shell
 google-chrome --disable-web-security
 ```
+
+References: https://alfilatov.com/posts/run-chrome-without-cors
