@@ -61,7 +61,7 @@ Cheers!
 **Question:** How to fix the CORS error like this?
 ![CORS_ERROR](https://user-images.githubusercontent.com/50355424/190922862-407431f9-a543-4cb4-8799-038429a3c8d5.jpeg)
 
-**Answer:** This issue coming from Google API, because the Google API doesn't accept http request from localhost. Follow instructions below
+**Answer:** This issue coming from Google API, because the Google API doesn't accept HTTP Request from localhost. Follow instructions below
 and choose based on the operating system your'e using.
 
 #### Windows
