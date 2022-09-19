@@ -17,7 +17,6 @@ const PlaceDetail = ({ open, data }) => {
           }}
           exit={{
             width: 0,
-            // transition: { delay: 0.5, duration: 0.3 },
           }}
           style={{
             position: "absolute",
@@ -28,7 +27,16 @@ const PlaceDetail = ({ open, data }) => {
             zIndex: 99,
           }}
         >
-          <div style={{ marginTop: "8rem", padding: "0 1.5rem" }}>
+          <motion.div
+            initial={{ display: "none" }}
+            animate={{
+              display: "block",
+            }}
+            exit={{
+              display: "none",
+            }}
+            style={{ marginTop: "8rem", padding: "0 1.5rem" }}
+          >
             <h2>{data.name}</h2>
             {data.formatted_address && (
               <div
@@ -70,7 +78,7 @@ const PlaceDetail = ({ open, data }) => {
                 <span>{data.formatted_phone_number}</span>
               </div>
             )}
-          </div>
+          </motion.div>
         </motion.div>
       )}
       ;
