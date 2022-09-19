@@ -1,29 +1,35 @@
-import React, { forwardRef, Fragment } from "react";
+import React, { Fragment } from "react";
 import Paper from "@mui/material/Paper";
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
+import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import Divider from "@mui/material/Divider";
 import { noop } from "lodash";
 import useStyles from "./CustomInput.styles";
 
-const CustomInput = forwardRef((props, ref) => {
-  const {
-    value,
-    children,
-    onClear = noop,
-    onChange = noop,
-    onClickSearch = noop,
-  } = props;
+const CustomInput = ({
+  value,
+  children,
+  openHamburger,
+  onClear = noop,
+  onChange = noop,
+  onClickSearch = noop,
+  onClickHamburger = noop,
+}) => {
   const { classes } = useStyles();
 
   return (
-    <div ref={ref}>
+    <div>
       <Paper className={classes.paper} component="form">
-        <IconButton sx={{ p: "10px" }} aria-label="menu">
-          <MenuIcon />
+        <IconButton
+          sx={{ p: "10px" }}
+          aria-label="menu"
+          onClick={onClickHamburger}
+        >
+          {!openHamburger ? <MenuIcon /> : <MenuOpenIcon />}
         </IconButton>
         <InputBase
           value={value}
@@ -69,6 +75,6 @@ const CustomInput = forwardRef((props, ref) => {
       {children}
     </div>
   );
-});
+};
 
 export default CustomInput;

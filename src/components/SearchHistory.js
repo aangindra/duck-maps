@@ -1,11 +1,12 @@
 import React, { Fragment } from "react";
 import { noop } from "lodash";
-import RoomIcon from "@mui/icons-material/Room";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import dayjs from "dayjs";
 import useStyles from "./Index.style";
 import { AnimatePresence, motion } from "framer-motion";
 import Divider from "@mui/material/Divider";
 
-const PlaceList = ({ open, data, onSelectPlace = noop }) => {
+const PlaceList = ({ open, data, onClick = noop }) => {
   const { classes } = useStyles();
   return (
     <AnimatePresence>
@@ -19,16 +20,14 @@ const PlaceList = ({ open, data, onSelectPlace = noop }) => {
             width: 0,
             transition: { delay: 0.5, duration: 0.3 },
           }}
-          style={{
-            position: "absolute",
-            top: 0,
-            bottom: 0,
-            left: 0,
-            backgroundColor: "#fff",
-            zIndex: 99,
-            overflow: "scroll",
-          }}
+          className={classes.sidebarContainer}
         >
+          {!data ||
+            (data.length < 1 && (
+              <h2 style={{ marginTop: "6rem", textAlign: "center" }}>
+                You don't have search history!
+              </h2>
+            ))}
           {data.map((item, index) => (
             <Fragment key={item.place_id}>
               <div
@@ -36,21 +35,16 @@ const PlaceList = ({ open, data, onSelectPlace = noop }) => {
                   marginTop: index === 0 ? "6rem" : 0,
                   padding: "0 1.5rem",
                 }}
-                onClick={onSelectPlace(item)}
+                onClick={onClick(item)}
               >
-                <h2 className={classes.title}>
-                  {item.structured_formatting.main_text}
-                </h2>
-                {item.structured_formatting.secondary_text && (
-                  <div
-                    style={{
-                      display: "flex",
-                      columnGap: "1rem",
-                      marginBottom: "1rem",
-                    }}
-                  >
-                    <RoomIcon />
-                    <span>{item.structured_formatting.secondary_text}</span>
+                <h2 className={classes.title}>{item.keyword}</h2>
+                {item._createdAt && (
+                  <div className={classes.rowColumn}>
+                    <AccessTimeIcon />
+                    <span>
+                      Search At:{" "}
+                      {dayjs(item._createdAt).format("YYYY-MM-DD HH:mm:ss")}
+                    </span>
                   </div>
                 )}
               </div>

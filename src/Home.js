@@ -10,6 +10,7 @@ import useStyles from "./Home.styles";
 import CustomInput from "./components/CustomInput";
 import PlaceDetail from "./components/PlaceDetail";
 import PlaceList from "./components/PlaceList";
+import SearchHistory from "./components/SearchHistory";
 
 const Marker = () => (
   <div>
@@ -77,6 +78,7 @@ const Home = () => {
   const [search, setSearch] = useState("");
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
   const [isOpenPlaceList, setIsOpenPlaceList] = useState(false);
+  const [isOpenSearchHistory, setIsOpenSearchHistory] = useState(false);
 
   const defaultProps = {
     zoom: 14,
@@ -126,6 +128,7 @@ const Home = () => {
       dispatch(getPlaces(placeData));
     } else {
       setIsOpenDropdown(false);
+      setIsOpenSearchHistory(false);
     }
   };
 
@@ -139,6 +142,7 @@ const Home = () => {
     setSearch(place.description);
     if (place.place_id) {
       setIsOpenPlaceList(false);
+      setIsOpenSearchHistory(false);
     }
   };
 
@@ -150,12 +154,14 @@ const Home = () => {
     setSearch("");
     setIsOpenDropdown(false);
     setIsOpenPlaceList(false);
+    setIsOpenSearchHistory(false);
   };
 
   const onSelectKeyword = (keyword) => (e) => {
     placeData.input = keyword;
     dispatch(getPlaces(placeData));
     setIsOpenDropdown(false);
+    setIsOpenSearchHistory(false);
     setIsOpenPlaceList(true);
   };
 
@@ -167,14 +173,21 @@ const Home = () => {
         data={places}
         onSelectPlace={onSelectPlace}
       />
+      <SearchHistory
+        open={isOpenSearchHistory}
+        data={savedKeywords}
+        onClick={onSelectKeyword}
+      />
       <div className={classes.searchWrapper} ref={searchWrapperRef}>
         <CustomInput
           ref={customInputRef}
           value={search}
+          openHamburger={isOpenSearchHistory}
           onChange={(e) => {
             handleSearch(e.target.value);
           }}
           onClickSearch={onSelectKeyword}
+          onClickHamburger={() => setIsOpenSearchHistory(!isOpenSearchHistory)}
           children={
             isOpenDropdown ? (
               <div>

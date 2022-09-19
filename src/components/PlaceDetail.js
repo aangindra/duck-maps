@@ -51,7 +51,7 @@ const PlaceDetail = ({ open, data }) => {
                 }}
               >
                 <AccessTimeIcon />
-                {!isPlaceOpen ? (
+                {isPlaceOpen ? (
                   <span style={{ color: "#188038" }}>Open</span>
                 ) : (
                   <span style={{ color: "#d93025" }}>Close</span>
