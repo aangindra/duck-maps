@@ -1,14 +1,22 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, Fragment } from "react";
 import Paper from "@mui/material/Paper";
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
+import Divider from "@mui/material/Divider";
+import { noop } from "lodash";
 import useStyles from "./CustomInput.styles";
 
 const CustomInput = forwardRef((props, ref) => {
-  const { value, onChange, children, onClear } = props;
+  const {
+    value,
+    children,
+    onClear = noop,
+    onChange = noop,
+    onClickSearch = noop,
+  } = props;
   const { classes } = useStyles();
 
   return (
@@ -23,18 +31,39 @@ const CustomInput = forwardRef((props, ref) => {
           placeholder="Search your place (min. 3 characters)"
           inputProps={{ "aria-label": "search your place" }}
           onChange={onChange}
+          onKeyDown={(e) => {
+            if (e && e.keyCode === 13 && value && value.length >= 3) {
+              e.preventDefault();
+              onClickSearch(value)();
+            }
+          }}
           id="searchInputField"
           autoComplete={"off"}
         />
-        {onClear && (
+        {value && value.length >= 3 && (
           <IconButton
             type="button"
             sx={{ p: "10px" }}
-            aria-label="close"
-            onClick={onClear}
+            aria-label="search"
+            onClick={() => {
+              onClickSearch(value)();
+            }}
           >
-            <CloseIcon />
+            <SearchIcon />
           </IconButton>
+        )}
+        {onClear && (
+          <Fragment>
+            <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
+            <IconButton
+              type="button"
+              sx={{ p: "10px" }}
+              aria-label="close"
+              onClick={onClear}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Fragment>
         )}
       </Paper>
       {children}

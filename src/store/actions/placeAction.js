@@ -28,13 +28,15 @@ export const getPlaceDetails = (data) => async (dispatch) => {
       type: PLACE.UPDATE_SELECTED_LOCATION,
       payload: result,
     });
-    dispatch({
-      type: PLACE.SAVE_KEYWORD_PLACE,
-      payload: {
-        keyword: data.keyword,
-        _createdAt: new Date().toISOString(),
-      },
-    });
+    if (data.keyword) {
+      dispatch({
+        type: PLACE.SAVE_KEYWORD_PLACE,
+        payload: {
+          keyword: data.keyword,
+          _createdAt: new Date().toISOString(),
+        },
+      });
+    }
     dispatch({
       type: PLACE.GET_PLACE,
       payload: [],

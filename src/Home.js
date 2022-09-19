@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Map from "google-map-react";
 import RoomIcon from "@mui/icons-material/Room";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -9,7 +9,7 @@ import { PLACE } from "./store/actions/actionTypes";
 import useStyles from "./Home.styles";
 import CustomInput from "./components/CustomInput";
 import PlaceDetail from "./components/PlaceDetail";
-import { MAPS } from "./constants";
+import PlaceList from "./components/PlaceList";
 
 const Marker = () => (
   <div>
@@ -17,7 +17,7 @@ const Marker = () => (
   </div>
 );
 
-const SavedKeyword = ({ classes, data, placeData, keyword }) => {
+const SavedKeyword = ({ classes, data, placeData, onSelectKeyword }) => {
   return data && data.length ? (
     <div
       className={classes.savedKeyword}
@@ -26,7 +26,11 @@ const SavedKeyword = ({ classes, data, placeData, keyword }) => {
       {orderBy(data, ["_createdAt"], ["desc"])
         .slice(0, 3)
         .map((item, index) => (
-          <div className={classes.searchList} key={`${item.keyword}_${index}`}>
+          <div
+            className={classes.searchList}
+            key={`${item.keyword}_${index}`}
+            onClick={onSelectKeyword(item.keyword)}
+          >
             <AccessTimeIcon sx={{ color: "#a8a8a8" }} />
             <span>{item.keyword}</span>
           </div>
@@ -72,6 +76,7 @@ const Home = () => {
 
   const [search, setSearch] = useState("");
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
+  const [isOpenPlaceList, setIsOpenPlaceList] = useState(false);
 
   const defaultProps = {
     zoom: 14,
@@ -132,6 +137,9 @@ const Home = () => {
     };
     dispatch(getPlaceDetails(payload));
     setSearch(place.description);
+    if (place.place_id) {
+      setIsOpenPlaceList(false);
+    }
   };
 
   const handleClearInput = () => {
@@ -141,10 +149,24 @@ const Home = () => {
     });
     setSearch("");
     setIsOpenDropdown(false);
+    setIsOpenPlaceList(false);
   };
+
+  const onSelectKeyword = (keyword) => (e) => {
+    placeData.input = keyword;
+    dispatch(getPlaces(placeData));
+    setIsOpenDropdown(false);
+    setIsOpenPlaceList(true);
+  };
+
   return (
     <div className={classes.container} ref={containerRef}>
       <PlaceDetail data={selectedPlace} open={selectedPlace} />
+      <PlaceList
+        open={isOpenPlaceList}
+        data={places}
+        onSelectPlace={onSelectPlace}
+      />
       <div className={classes.searchWrapper} ref={searchWrapperRef}>
         <CustomInput
           ref={customInputRef}
@@ -152,6 +174,7 @@ const Home = () => {
           onChange={(e) => {
             handleSearch(e.target.value);
           }}
+          onClickSearch={onSelectKeyword}
           children={
             isOpenDropdown ? (
               <div>
@@ -160,6 +183,7 @@ const Home = () => {
                   data={savedKeywords}
                   placeData={places}
                   keyword={search}
+                  onSelectKeyword={onSelectKeyword}
                 />
                 <SearchResult
                   classes={classes}
@@ -170,10 +194,9 @@ const Home = () => {
               </div>
             ) : null
           }
-          onClear={selectedPlace ? handleClearInput : null}
+          onClear={selectedPlace || isOpenPlaceList ? handleClearInput : null}
         />
       </div>
-      {console.log(get(selectedPlace, "geometry.location", userLocation))}
       <Map
         bootstrapURLKeys={{ key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY }}
         center={get(selectedPlace, "geometry.location", userLocation)}

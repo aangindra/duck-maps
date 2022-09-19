@@ -17,7 +17,7 @@ const PlaceDetail = ({ open, data }) => {
           }}
           exit={{
             width: 0,
-            transition: { delay: 0.7, duration: 0.3 },
+            // transition: { delay: 0.5, duration: 0.3 },
           }}
           style={{
             position: "absolute",
